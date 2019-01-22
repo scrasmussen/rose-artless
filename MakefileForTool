@@ -1,0 +1,40 @@
+## This variable can be set by an installation or a configure script
+#
+ROSE_HOME = /Users/rasmussen17/ROSE/install-master
+
+## Makefile variables come from rose-config.cfg
+#
+include $(ROSE_HOME)/lib/rose-config.cfg
+
+CC        = $(ROSE_CC)
+CXX       = $(ROSE_CXX)
+CPPFLAGS  = $(ROSE_CPPFLAGS)
+CFLAGS    = $(ROSE_CFLAGS)
+CXXFLAGS  = $(ROSE_CXXFLAGS)
+LDFLAGS   = $(ROSE_LINK_RPATHS) $(ROSE_LDFLAGS)
+ROSE_LIBTOOL  = $(ROSE_HOME)/bin/libtool
+
+CXXFLAGS += -g -O0
+
+## default makefile rules
+#
+%.o : %.C
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ -c $<
+
+% : %.o
+	$(CXX) $(LDFLAGS) -o $@ $<
+
+#------ Users should only need to change the following ------
+
+# default target
+all: restrictLanguages
+
+restrictLanguages: restrictLanguages.o Restrictions.o
+	/bin/sh $(ROSE_LIBTOOL) --mode=link $(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $@.C Restrictions.o
+
+# dependencies
+restrictLanguages.o Restrictions.o: Restrictions.h
+
+clean:
+	rm -f *.o
+	rm -f restrictLanguages
