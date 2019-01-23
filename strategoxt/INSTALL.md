@@ -12,7 +12,7 @@ Build and install instructions
 ------------------------------
 
    1. The 64-bit ATerm library
-      
+
       The source is at https://github.com/rasmussn/aterms/releases/tag/v3.0
       This library must be built as 64 bit because it is linked with the ROSE library.
 
