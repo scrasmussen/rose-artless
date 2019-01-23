@@ -4,6 +4,11 @@
 # University of Oregon
 # 2016
 
+function run() {
+    echo $@
+    eval $@
+}
+
 STRATEGOXTDIR=strategoxt-0.17
 STRATEGOXTTAR=${STRATEGOXTDIR}.tar.gz
 STRATEGOXTURL=http://ftp.strategoxt.org/pub/stratego/StrategoXT/strategoxt-0.17/${STRATEGOXTTAR}
@@ -25,8 +30,10 @@ ATERMPREFIX=${PREFIX}/aterm
 SDF2PREFIX=${PREFIX}/sdf2-bundle
 STRATEGOXTPREFIX=${PREFIX}/strategoxt
 
-# Installing in 32 bit is important!
-CFLAGS="-m32"
+# # Installing in 32 bit is important!
+# CFLAGS="-m32"
+
+all=true
 for key in "$@"; do
     case $key in
         # TO DO: help section
@@ -36,19 +43,30 @@ for key in "$@"; do
             ;;
 	--clean)
 	    clean=true
+	    all=false
+	    ;;
+	--clean-dir)
+	    clean_dir=true
+	    all=false
 	    ;;
 	-d|--download)
 	    download=true
+	    all=false
 	    ;;
 	-i|--install)
 	    install=true
+	    all=false
 	    ;;
         --prefix=*)
             PREFIX="${key#*=}"
             ;;
 	-u|--untar)
 	    untar=true
+	    all=false
 	    ;;
+	*)
+	    echo "INVALID COMMAND LINE ARGUMENT: $key"
+	    exit 1
         # TO DO
         # cflags=*)
         #    cflags = "-m 32" + "USER STRING"
@@ -56,6 +74,12 @@ for key in "$@"; do
     esac
     shift
 done
+
+if [ "$all" = true ] ; then
+    download=true
+    install=true
+    untar=true
+fi
 
 if [ "$download" = true ] ; then
     # download files if they aren't in current directory
@@ -73,74 +97,64 @@ fi
 # untar files if they aren't there
 if [ "$untar" = true ] ; then
     if [ ! -d ${STRATEGOXTDIR} ] ; then
-	cmd="tar zxf ${STRATEGOXTTAR}"
-	echo $cmd
-	eval $cmd
+	run "tar zxf ${STRATEGOXTTAR}"
     fi
     if [ ! -d ${ATERMDIR} ] ; then
-	cmd="tar zxf ${ATERMTAR}"
-	echo $cmd
-	eval $cmd
+	run "tar zxf ${ATERMTAR}"
     fi
     if [ ! -d ${SDF2DIR} ] ; then
-	cmd="tar zxf ${SDF2TAR}"
-	echo $cmd
-	eval $cmd
+	run "tar zxf ${SDF2TAR}"
     fi
 fi
 
 # install files
 if [ "$install" = true ] ; then
     # install aterm
-    install_aterm=false
+    install_aterm=true
     if [ "$install_aterm" = true ] ; then
-	cd ${ATERMDIR}
-	cmd="./configure --prefix=${PREFIX}/aterm CFLAGS=$CFLAGS"
-	echo $cmd
-	eval $cmd
-	echo "make"
-	make
-	echo "make install"
-	make install
+	run "cd ${ATERMDIR}/aterm"
+	CFLAGS+=-DAT_64BIT
+	run 'sed -i "1s/^/CFLAGS=-DAT_64BIT \n/" aterm.pc.in'
+
+	run "export CFLAGS=$CFLAGS"
+	run "./configure --prefix=${PREFIX}/aterm CFLAGS=$CFLAGS"
+	run "make"
+	run "make install"
+	run "mkdir -p ${PREFIX}/aterm/lib/pkgconfig"
+	run "cp aterm.pc ${PREFIX}/aterm/lib/pkgconfig"
+	run "cd ../.."
 	echo ; echo "---------------ATERM INSTALLED---------------" ; echo
-	cd ..
     fi
 
     # install sdf2-bundle
-    install_sdf2=false
+    install_sdf2=true
     if [ "$install_sdf2" = true ] ; then
-	cd ${SDF2DIR}
-	cmd="./configure --prefix=${PREFIX}/sdf2-bundle --with-aterm=${PREFIX}/aterm CFLAGS=$CFLAGS"
-	echo $cmd
-	eval $cmd
-	echo "make"
-	make
-	echo "make install"
-	make install
-	echo ; echo "---------------SDF2 INSTALLED---------------" ; echo
+	run "cd ${SDF2DIR}"
+	run "./configure --prefix=${PREFIX}/sdf2-bundle --with-aterm=${PREFIX}/aterm CFLAGS=$CFLAGS"
+	run "make"
+	run "make install"
 	cd ..
+	echo ; echo "---------------SDF2 INSTALLED---------------" ; echo
     fi
 
     # install strategoxt
-    install_stratego=false
+    install_stratego=true
     if [ "$install_stratego" = true ] ; then
-	cd ${STRATEGOXTDIR}
-	cmd="./configure --prefix=${PREFIX}/strategoxt --with-aterm=${PREFIX}/aterm --with-sdf=${PREFIX}/sdf2-bundle CFLAGS=$CFLAGS"
-	echo $cmd
-	eval $cmd
-	echo "make"
-	make
-	echo "make install"
-	make install
-	echo ; echo "---------------STRATEGOXT INSTALLED---------------" ; echo
+	run "cd ${STRATEGOXTDIR}"
+	run "./configure --prefix=${PREFIX}/strategoxt --with-aterm=${PREFIX}/aterm --with-sdf=${PREFIX}/sdf2-bundle CFLAGS=$CFLAGS"
+	run "make"
+	run "make install"
 	cd ..
+	echo ; echo "---------------STRATEGOXT INSTALLED---------------" ; echo
     fi
 fi
 
+if [ "$clean_dir" = true ] ; then
+    run "rm -rf ${ATERMDIR} ${SDF2DIR} ${STRATEGOXTDIR}"
+fi
 if [ "$clean" = true ] ; then
-    cmd="rm -rf ${ATERMDIR} ${SDF2DIR} ${STRATEGOXTDIR}"
-    echo $cmd
-    eval $cmd
+    run "rm -rf ${ATERMDIR} ${SDF2DIR} ${STRATEGOXTDIR}"
+    run "rm ${ATERMTAR} ${SDF2TAR} ${STRATEGOXTTAR}"
 fi
 
 exit 1
