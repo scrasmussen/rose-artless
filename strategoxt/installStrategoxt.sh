@@ -38,8 +38,14 @@ for key in "$@"; do
     case $key in
         # TO DO: help section
         -h|--help)
-	    echo "--prefix=/install/dir"
+	    echo "--clean"
+	    echo "--clean-dir"
+	    echo "-d, --download"
+	    echo "-i, --install"
             echo "-h, --help", $key
+	    echo "--prefix=/install/dir"
+	    echo "-u,--untar"
+	    exit 1
             ;;
 	--clean)
 	    clean=true
