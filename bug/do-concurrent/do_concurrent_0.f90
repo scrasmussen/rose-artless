@@ -1,8 +1,6 @@
 program doconcurrent_0
-  integer :: i
+  integer :: i, a
   do concurrent (i=1:4)
-     print *, "i = ", i
+     a = -1
   end do
-
-  print *, "Fin"
 end program doconcurrent_0
