@@ -1,0 +1,9 @@
+/home/users/scrasmussen/src/ROSE/rose-012119-boost-1.61-src/exampleTranslators/defaultTranslator/defaultTranslator do_concurrent_0.f90 -rose:experimental_fortran_frontend
+Using experimental fortran frontend (explicitly set: ON) 
+...TODO... fully implement AttrSpecList in TypeDeclarationStmt: list is 0x7f567cabc070
+...TODO... implement Submodule
+
+FAILED: in experimental_openFortranParser_main(), unable to traverse file do_concurrent_0.f90.aterm
+
+Error returned from call to experimental_openFortranParser_main(): FAILED! (frontendErrorLevel = 1) 
+make: *** [build] Error 1
