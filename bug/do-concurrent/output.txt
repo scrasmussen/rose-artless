@@ -1,9 +1,16 @@
+------------- TEST: regular Fortran frontend  -------------
+/home/users/scrasmussen/src/ROSE/rose-012119-boost-1.61-src/exampleTranslators/defaultTranslator/defaultTranslator do_concurrent_0.f90
+lt-defaultTranslator: /home/users/scrasmussen/src/rose/rose-git/src/frontend/OpenFortranParser_SAGE_Connection/FortranParserActionROSE.C:11962: void c_action_do_stmt(Token_t*, Token_t*, Token_t*, Token_t*, Token_t*, ofp_bool): Assertion `false' failed.
+Error: astExpressionStack.size() incorrect for do_stmt astExpressionStack.size() = 0 
+make: *** [build] Aborted (core dumped)
+------------- TEST: experimental Fortran frontend -------------
 /home/users/scrasmussen/src/ROSE/rose-012119-boost-1.61-src/exampleTranslators/defaultTranslator/defaultTranslator do_concurrent_0.f90 -rose:experimental_fortran_frontend
 Using experimental fortran frontend (explicitly set: ON) 
-...TODO... fully implement AttrSpecList in TypeDeclarationStmt: list is 0x7fd53b40c070
+...TODO... fully implement AttrSpecList in TypeDeclarationStmt: list is 0x7efc9253e070
 ...TODO... implement Submodule
 
 FAILED: in experimental_openFortranParser_main(), unable to traverse file do_concurrent_0.f90.aterm
 
 Error returned from call to experimental_openFortranParser_main(): FAILED! (frontendErrorLevel = 1) 
-make: *** [build] Error 1
+make: *** [buildexp] Error 1
+make: Target `all' not remade because of errors.
